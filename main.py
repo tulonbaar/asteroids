@@ -96,7 +96,7 @@ def main():
                     if asteroid.collides_with(shot):
                         # Add points for destroying asteroid based on its size
                         score += asteroid.radius * constants.SCORE_ASTEROID_MULTIPLIER
-                        asteroid.kill()
+                        asteroid.split()  # Split the asteroid instead of just killing it
                         shot.kill()
                         break  # Exit the inner loop since this asteroid is destroyed
             
