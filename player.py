@@ -8,6 +8,7 @@ class Player(CircleShape):
         super().__init__(x, y, constants.PLAYER_RADIUS)
         self.rotation = 0  # in degrees
         self.velocity = pygame.Vector2(0, 0)
+        self.shoot_timer = 0
 
     # in the player class
     def triangle(self):
@@ -25,6 +26,10 @@ class Player(CircleShape):
         self.rotation += constants.PLAYER_TURN_SPEED * dt
 
     def update(self, dt):
+        # Decrease the shoot timer
+        if self.shoot_timer > 0:
+            self.shoot_timer -= dt
+            
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
@@ -45,5 +50,9 @@ class Player(CircleShape):
         self.position += forward * constants.PLAYER_SPEED * dt
 
     def shoot(self):
-        # Create a shot at the player's position
-        shot = Shot(self.position.x, self.position.y, pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_SHOOT_SPEED)
+        # Only shoot if the cooldown timer has expired
+        if self.shoot_timer <= 0:
+            # Create a shot at the player's position
+            shot = Shot(self.position.x, self.position.y, pygame.Vector2(0, 1).rotate(self.rotation) * constants.PLAYER_SHOOT_SPEED)
+            # Set the cooldown timer
+            self.shoot_timer = constants.PLAYER_SHOOT_COOLDOWN
