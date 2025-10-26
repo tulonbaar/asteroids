@@ -1,5 +1,6 @@
 import pygame
 import constants
+from player import Player
 
 def main():
     print("Starting Asteroids!")
@@ -15,7 +16,7 @@ def main():
     clock = pygame.time.Clock()
     dt = 0
 
-
+    player1 = Player(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2)
 
     while True:
         dt = clock.tick(60) / 1000  # Amount of seconds since last frame
@@ -24,7 +25,10 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
+            
         screen.fill((0, 0, 0))
+        player1.update(dt)
+        player1.draw(screen)
         pygame.display.flip()
 
 if __name__ == "__main__":
