@@ -40,11 +40,16 @@ def main():
     # Initialize font for text rendering
     font_large = pygame.font.Font(None, 74)
     font_medium = pygame.font.Font(None, 36)
+    font_small = pygame.font.Font(None, 24)
     
     # Game states
     PLAYING = "playing"
     GAME_OVER = "game_over"
     game_state = PLAYING
+    
+    # Score and time tracking
+    score = 0
+    game_time = 0
     
     # Create initial game objects
     updatables, drawables, asteroids, shots, player1, asteroid_field = create_game_objects()
@@ -60,6 +65,8 @@ def main():
                 if event.key == pygame.K_SPACE and game_state == GAME_OVER:
                     # Restart the game
                     game_state = PLAYING
+                    score = 0
+                    game_time = 0
                     # Clear all sprite groups
                     updatables.empty()
                     drawables.empty()
@@ -73,14 +80,32 @@ def main():
         if game_state == PLAYING:
             updatables.update(dt)
             
+            # Update game time and score for time
+            game_time += dt
+            score += dt * constants.SCORE_TIME_MULTIPLIER
+            
             # Check for collisions between player and asteroids
             for asteroid in asteroids:
                 if player1.collides_with(asteroid):
                     game_state = GAME_OVER
                     break
             
+            # Check for collisions between shots and asteroids
+            for asteroid in asteroids:
+                for shot in shots:
+                    if asteroid.collides_with(shot):
+                        # Add points for destroying asteroid based on its size
+                        score += asteroid.radius * constants.SCORE_ASTEROID_MULTIPLIER
+                        asteroid.kill()
+                        shot.kill()
+                        break  # Exit the inner loop since this asteroid is destroyed
+            
             for drawable in drawables:
                 drawable.draw(screen)
+            
+            # Draw score in top-left corner
+            score_text = font_small.render(f"Score: {int(score)}", True, (255, 255, 255))
+            screen.blit(score_text, (10, 10))
         
         elif game_state == GAME_OVER:
             # Draw all game objects (frozen)
@@ -89,13 +114,16 @@ def main():
             
             # Draw Game Over text
             game_over_text = font_large.render("Game Over!", True, (255, 255, 255))
+            final_score_text = font_medium.render(f"Final Score: {int(score)}", True, (255, 255, 255))
             restart_text = font_medium.render("Press spacebar to restart", True, (255, 255, 255))
             
             # Center the text on screen
-            game_over_rect = game_over_text.get_rect(center=(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2 - 50))
-            restart_rect = restart_text.get_rect(center=(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2 + 20))
+            game_over_rect = game_over_text.get_rect(center=(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2 - 70))
+            final_score_rect = final_score_text.get_rect(center=(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2 - 20))
+            restart_rect = restart_text.get_rect(center=(constants.SCREEN_WIDTH // 2, constants.SCREEN_HEIGHT // 2 + 30))
             
             screen.blit(game_over_text, game_over_rect)
+            screen.blit(final_score_text, final_score_rect)
             screen.blit(restart_text, restart_rect)
             
         pygame.display.flip()

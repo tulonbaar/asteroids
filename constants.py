@@ -14,3 +14,7 @@ PLAYER_SHOOT_SPEED = 500
 PLAYER_SHOOT_COOLDOWN = 0.3
 
 SHOT_RADIUS = 5
+
+# Scoring system
+SCORE_TIME_MULTIPLIER = 10  # points per second
+SCORE_ASTEROID_MULTIPLIER = 100  # points per radius unit
